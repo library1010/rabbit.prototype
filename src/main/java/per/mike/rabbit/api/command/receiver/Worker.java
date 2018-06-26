@@ -1,56 +1,39 @@
 package per.mike.rabbit.api.command.receiver;
 
 import java.io.IOException;
+import java.util.concurrent.TimeoutException;
 
-import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
-import com.rabbitmq.client.Connection;
-import com.rabbitmq.client.ConnectionFactory;
-import com.rabbitmq.client.Consumer;
-import com.rabbitmq.client.DefaultConsumer;
-import com.rabbitmq.client.Envelope;
+
+import per.mike.rabbit.api.command.common.ConnectionFactoryCreator;
 
 public class Worker {
 
-  private static final String TASK_QUEUE_NAME = "hello";
+  private final static String QUEUE_NAME = "durable_queue";
+  private Channel channel;
 
-  public static void main(String[] argv) throws Exception {
-    ConnectionFactory factory = new ConnectionFactory();
-    factory.setHost("localhost");
-    final Connection connection = factory.newConnection();
-    final Channel channel = connection.createChannel();
-
-    channel.queueDeclare(TASK_QUEUE_NAME, true, false, false, null);
-    System.out.println(" [*] Waiting for messages. To exit press CTRL+C");
-
-    channel.basicQos(1);
-
-    final Consumer consumer = new DefaultConsumer(channel) {
-      @Override
-      public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
-        String message = new String(body, "UTF-8");
-
-        System.out.println(" [x] Received '" + message + "'");
-        try {
-          doWork(message);
-        } finally {
-          System.out.println(" [x] Done");
-          channel.basicAck(envelope.getDeliveryTag(), false);
-        }
-      }
-    };
-    channel.basicConsume(TASK_QUEUE_NAME, false, consumer);
-  }
-
-  private static void doWork(String task) {
-    for (char ch : task.toCharArray()) {
-      if (ch == '.') {
-        try {
-          Thread.sleep(1000);
-        } catch (InterruptedException _ignored) {
-          Thread.currentThread().interrupt();
-        }
-      }
+  public void openConnection() throws IOException {
+    try {
+      channel = new ConnectionFactoryCreator()
+          .createConnectionFactory("localhost")
+          .newConnection()
+          .createChannel();
+    } catch (Exception ex) {
     }
   }
+
+  public void command() throws IOException, InterruptedException, TimeoutException {
+    boolean autoAck = false;
+    channel.queueDeclare(QUEUE_NAME, false, false, false, null);
+    channel.basicQos(1);
+    System.out.println(" [*] Waiting for messages. To exit press CTRL+C");
+    channel.basicConsume(QUEUE_NAME, autoAck, new WorkerConsumer(channel));
+  }
+
+  public static void main(String[] args) throws IOException, InterruptedException, TimeoutException {
+    Worker receiver = new Worker();
+    receiver.openConnection();
+    receiver.command();
+  }
+
 }

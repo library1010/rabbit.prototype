@@ -9,7 +9,7 @@ import com.rabbitmq.client.MessageProperties;
 
 import per.mike.rabbit.api.command.common.ConnectionFactoryCreator;
 
-public class Sender {
+public class TaskCreator {
 
   private final static String QUEUE_NAME = "durable_queue";
 
@@ -29,15 +29,7 @@ public class Sender {
   
   private static void sendBulkMessage(String... strings) throws IOException, TimeoutException {
     for(String message : strings) {
-      new Sender().command(message);  
+      new TaskCreator().command(message);  
     }
-  }
-
-  @SuppressWarnings("unused")
-  private static String getMessage(String... strings) {
-    if (strings.length < 1) {
-      return "Hello World! Isn't me you're looking for?";
-    }
-    return String.join(" ", strings);
   }
 }
