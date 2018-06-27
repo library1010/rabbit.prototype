@@ -1,4 +1,4 @@
-package per.mike.rabbit.api.command.receiver;
+package per.mike.rabbit.api.command.receiver.consumer;
 
 import java.io.IOException;
 

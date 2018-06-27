@@ -2,15 +2,12 @@ package per.mike.rabbit.api.command.receiver;
 
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
-
 import com.rabbitmq.client.Channel;
-
 import per.mike.rabbit.api.command.common.ConnectionFactoryCreator;
-import per.mike.rabbit.api.command.receiver.consumer.WorkerConsumer;
+import per.mike.rabbit.api.command.receiver.consumer.SystemOutConsumer;
 
-public class Worker {
-
-  private final static String QUEUE_NAME = "durable_queue";
+public class LogMonitor {
+  private final static String EXCHANGE_NAME = "logs";
   private Channel channel;
 
   public void openConnection() throws IOException {
@@ -24,15 +21,16 @@ public class Worker {
   }
 
   public void command() throws IOException, InterruptedException, TimeoutException {
-    boolean autoAck = false;
-    channel.queueDeclare(QUEUE_NAME, false, false, false, null);
-    channel.basicQos(1);
-    System.out.println(" [*] Waiting for messages. To exit press CTRL+C");
-    channel.basicConsume(QUEUE_NAME, autoAck, new WorkerConsumer(channel));
+    channel.exchangeDeclare(EXCHANGE_NAME, "fanout");
+    String queueName = channel.queueDeclare().getQueue();
+    channel.queueBind(queueName, EXCHANGE_NAME, "");
+    
+    System.out.println(String.format(" [*] Waiting for messages on queue %s. To exit press CTRL+C", queueName));
+    channel.basicConsume(queueName, true, new SystemOutConsumer(channel));
   }
 
   public static void main(String[] args) throws IOException, InterruptedException, TimeoutException {
-    Worker receiver = new Worker();
+    LogMonitor receiver = new LogMonitor();
     receiver.openConnection();
     receiver.command();
   }
