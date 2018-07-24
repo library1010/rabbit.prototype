@@ -1,12 +1,14 @@
 package per.mike.rabbit.api.command.receiver;
 
+import static com.rabbitmq.client.BuiltinExchangeType.*;
+
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 import com.rabbitmq.client.Channel;
 import per.mike.rabbit.api.command.common.ConnectionFactoryCreator;
 import per.mike.rabbit.api.command.receiver.consumer.SystemOutConsumer;
 
-public class LogMonitor {
+public class GeneralLogMonitor {
   private final static String EXCHANGE_NAME = "logs";
   private Channel channel;
 
@@ -21,7 +23,7 @@ public class LogMonitor {
   }
 
   public void command() throws IOException, InterruptedException, TimeoutException {
-    channel.exchangeDeclare(EXCHANGE_NAME, "fanout");
+    channel.exchangeDeclare(EXCHANGE_NAME, FANOUT);
     String queueName = channel.queueDeclare().getQueue();
     channel.queueBind(queueName, EXCHANGE_NAME, "");
     
@@ -30,7 +32,7 @@ public class LogMonitor {
   }
 
   public static void main(String[] args) throws IOException, InterruptedException, TimeoutException {
-    LogMonitor receiver = new LogMonitor();
+    GeneralLogMonitor receiver = new GeneralLogMonitor();
     receiver.openConnection();
     receiver.command();
   }

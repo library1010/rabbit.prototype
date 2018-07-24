@@ -6,7 +6,7 @@ import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import per.mike.rabbit.api.command.common.ConnectionFactoryCreator;
 
-public class EmitLog {
+public class FanoutEmitLog {
   private final static String EXCHANGE_NAME = "logs";
 
   public void command(String message) throws IOException, TimeoutException {
@@ -25,7 +25,7 @@ public class EmitLog {
   
   private static void sendBulkMessage(String... strings) throws IOException, TimeoutException {
     for(String message : strings) {
-      new EmitLog().command(message);  
+      new FanoutEmitLog().command(message);  
     }
   }
 }
