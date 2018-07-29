@@ -1,8 +1,9 @@
 package per.mike.rabbit.api.command.common;
 
-public enum LogLayer implements IEnumToType {
-  FATAL, ERROR, INFO, DEBUG, WARNING,;
+public enum Facility implements IEnumToType {
 
+  KERNEL, CRON, AUTH,;
+  
   @Override
   public String getType() {
     return this.name().toLowerCase();
