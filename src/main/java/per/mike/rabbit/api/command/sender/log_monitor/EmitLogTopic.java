@@ -15,7 +15,7 @@ public class EmitLogTopic {
     try (Connection connection = new ConnectionFactoryCreator().createConnectionFactory("localhost").newConnection();
         Channel channel = connection.createChannel()) {
       
-      channel.exchangeDeclare(EXCHANGE_NAME, DIRECT);
+      channel.exchangeDeclare(EXCHANGE_NAME, TOPIC);
       channel.basicPublish(EXCHANGE_NAME, logEntry.getType(), null, logEntry.toString().getBytes());
       System.out.println(String.format(" [x] Sent '%s'", logEntry.toString()));
     }

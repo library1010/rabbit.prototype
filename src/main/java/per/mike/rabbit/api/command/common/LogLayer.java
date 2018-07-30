@@ -1,10 +1,18 @@
 package per.mike.rabbit.api.command.common;
 
-public enum LogLayer implements IEnumToType {
-  FATAL, ERROR, INFO, DEBUG, WARNING,;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
-  @Override
-  public String getType() {
-    return this.name().toLowerCase();
-  }
+@AllArgsConstructor
+@Getter
+public enum LogLayer {
+  FATAL("fatal"), 
+  ERROR("error"), 
+  INFO("info"), 
+  DEBUG("debug"), 
+  WARNING("warning"), 
+  NONE("*"),
+  ;
+
+  private String routingKey;
 }

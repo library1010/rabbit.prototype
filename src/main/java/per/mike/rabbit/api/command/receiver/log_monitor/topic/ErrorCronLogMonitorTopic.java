@@ -6,14 +6,16 @@ import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 import com.rabbitmq.client.Channel;
 import per.mike.rabbit.api.command.common.ConnectionFactoryCreator;
+import per.mike.rabbit.api.command.common.Facility;
+import per.mike.rabbit.api.command.common.RoutingKeyCreator;
 import per.mike.rabbit.api.command.receiver.consumer.SystemOutConsumer;
 
-public class ErrorLogMonitorTopic {
+public class ErrorCronLogMonitorTopic {
   private static final String LOCALHOST = "localhost";
   private final static String EXCHANGE_NAME = "logs";
   private Channel channel;
 
-  public ErrorLogMonitorTopic() {
+  public ErrorCronLogMonitorTopic() {
     try {
       // @formatter:off
       channel = new ConnectionFactoryCreator()
@@ -27,7 +29,13 @@ public class ErrorLogMonitorTopic {
   public void command() throws IOException, InterruptedException, TimeoutException {
     channel.exchangeDeclare(EXCHANGE_NAME, TOPIC);
     String queueName = channel.queueDeclare().getQueue();
-    channel.queueBind(queueName, EXCHANGE_NAME, ERROR.getType());
+    channel.queueBind(queueName, EXCHANGE_NAME, 
+        RoutingKeyCreator
+          .builder()
+          .logLayer(ERROR)
+          .facility(Facility.CRON)
+          .build()
+          .createRoutingKey());
 
     System.out.println(
         String.format(" [*] Waiting for messages on queue %s. To exit press CTRL+C", queueName));
@@ -35,6 +43,6 @@ public class ErrorLogMonitorTopic {
   }
 
   public static void main(String[] args) throws Exception {
-    new ErrorLogMonitorTopic().command();
+    new ErrorCronLogMonitorTopic().command();
   }
 }

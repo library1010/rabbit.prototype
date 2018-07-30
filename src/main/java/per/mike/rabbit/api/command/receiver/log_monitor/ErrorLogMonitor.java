@@ -27,7 +27,7 @@ public class ErrorLogMonitor {
   public void command() throws IOException, InterruptedException, TimeoutException {
     channel.exchangeDeclare(EXCHANGE_NAME, DIRECT);
     String queueName = channel.queueDeclare().getQueue();
-    channel.queueBind(queueName, EXCHANGE_NAME, ERROR.getType());
+    channel.queueBind(queueName, EXCHANGE_NAME, ERROR.getRoutingKey());
 
     System.out.println(
         String.format(" [*] Waiting for messages on queue %s. To exit press CTRL+C", queueName));

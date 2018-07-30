@@ -17,7 +17,7 @@ public class LogEntry {
   }
   
   public String getType() {
-    return type.getType();
+    return type.getRoutingKey();
   }
   
   public String toString() {

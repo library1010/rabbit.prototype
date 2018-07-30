@@ -1,11 +1,17 @@
 package per.mike.rabbit.api.command.common;
 
-public enum Facility implements IEnumToType {
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
-  KERNEL, CRON, AUTH,;
+@AllArgsConstructor
+@Getter
+public enum Facility {
+
+  KERNEL("kernel"), 
+  CRON("cron"),
+  AUTH("auth"), 
+  NONE("*"),
+  ;
   
-  @Override
-  public String getType() {
-    return this.name().toLowerCase();
-  }
+  private String routingKey;
 }

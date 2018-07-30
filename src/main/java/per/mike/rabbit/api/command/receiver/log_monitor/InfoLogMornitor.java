@@ -28,7 +28,7 @@ public class InfoLogMornitor {
   public void command() throws IOException, InterruptedException, TimeoutException {
     channel.exchangeDeclare(EXCHANGE_NAME, DIRECT);
     String queueName = channel.queueDeclare().getQueue();
-    channel.queueBind(queueName, EXCHANGE_NAME, INFO.getType());
+    channel.queueBind(queueName, EXCHANGE_NAME, INFO.getRoutingKey());
 
     System.out.println(
         String.format(" [*] Waiting for messages on queue %s. To exit press CTRL+C", queueName));
